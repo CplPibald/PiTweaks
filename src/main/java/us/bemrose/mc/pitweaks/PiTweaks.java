@@ -49,12 +49,23 @@ public class PiTweaks {
         java.util.List<Tweak> tweaks = new java.util.LinkedList<Tweak>();
 
         if (cfg.getBoolean("enabled", "norepaircost", false, "Removes cumulative repair cost from anvils.")) {
-            tweaks.add(new RepairCostCheat());
+            tweaks.add(new RepairCostTweak());
         }
 
         if (cfg.getBoolean("enabled", "fastfurnace", false, "Vanilla furnaces are 20x faster.")) {
-            tweaks.add(new FastFurnaceCheat());
+            tweaks.add(new FastFurnaceTweak());
         }
+
+        if (cfg.getBoolean("enabled", "buoyantboats", false, "Boats float up flowing water instead of sinking.")) {
+            boolean dontEject = cfg.getBoolean("dontEjectPassengers", "buoyantboats", false, "Disables vanilla behavior of ejecting passengers from a boat after 3 seconds underwater.");
+            tweaks.add(new BuoyantBoatTweak(dontEject));
+        }
+
+        if (cfg.getBoolean("enabled", "2x2-recipes", false, "Enables 2x2 versions of stair and slab recipes, and adds recipes to recombine them into their base blocks.")) {
+            tweaks.add(new StairSlabTweak());
+        }
+
+
         return tweaks;
     }
 

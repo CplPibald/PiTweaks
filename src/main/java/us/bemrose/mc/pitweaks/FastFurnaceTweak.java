@@ -1,6 +1,6 @@
 package us.bemrose.mc.pitweaks;
 
-public class FastFurnaceCheat extends Tweak {
+public class FastFurnaceTweak extends Tweak {
 
     @Override
     public void init(net.minecraftforge.fml.common.event.FMLInitializationEvent event) {

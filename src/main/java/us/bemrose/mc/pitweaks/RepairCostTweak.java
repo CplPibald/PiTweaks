@@ -2,7 +2,7 @@ package us.bemrose.mc.pitweaks;
 
 import net.minecraft.item.ItemStack;
 
-public class RepairCostCheat extends Tweak {
+public class RepairCostTweak extends Tweak {
 
     @Override
     public void init(net.minecraftforge.fml.common.event.FMLInitializationEvent event) {
