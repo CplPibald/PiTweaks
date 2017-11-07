@@ -52,8 +52,10 @@ public class PiTweaks {
             tweaks.add(new RepairCostTweak());
         }
 
-        if (cfg.getBoolean("enabled", "fastfurnace", false, "Vanilla furnaces are 20x faster.")) {
-            tweaks.add(new FastFurnaceTweak());
+        if (cfg.getBoolean("enabled", "fastfurnace", false, "Vanilla furnaces are faster.")) {
+            int mult = cfg.getInt("multiplier", "fastfurnace", 20, 1, 200, "Cook speed multiplier. Time per item is (10/multiplier) seconds. Value must be a factor of 200. Valid values (2,4,5,8,10,20,25,40,50,100)");
+            if (200 % mult != 0) { mult = 2; }
+            tweaks.add(new FastFurnaceTweak(mult));
         }
 
         if (cfg.getBoolean("enabled", "buoyantboats", false, "Boats float up flowing water instead of sinking.")) {

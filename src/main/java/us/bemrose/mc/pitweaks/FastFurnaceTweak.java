@@ -2,6 +2,15 @@ package us.bemrose.mc.pitweaks;
 
 public class FastFurnaceTweak extends Tweak {
 
+    public static int multiplier = 20;
+
+    public FastFurnaceTweak(int mult) {
+        // Code smell: setting static member from constructor.
+        // But hey, this is a singleton.
+        multiplier = mult;
+    }
+
+
     @Override
     public void init(net.minecraftforge.fml.common.event.FMLInitializationEvent event) {
         // Register block place event
