@@ -43,13 +43,20 @@ public class StairSlabTweak extends Tweak {
             if (ir instanceof ShapedRecipes) {
                 ShapedRecipes sr = (ShapedRecipes)ir;
 
+                // Protect ourselves from other mods' malformed recipes
+                if (sr.recipeItems.size() <= 0) { continue; }
+                Ingredient input = sr.recipeItems.get(0);
+                if (input.equals(Ingredient.EMPTY)) { continue; }
+                ItemStack[] inputStacks = input.getMatchingStacks();
+                if (inputStacks.length <= 0) { continue; }
+                
+                // Only consider recipes whose first ingredient is a block
+                if (!(inputStacks[0].getItem() instanceof ItemBlock)) { continue; }
+                
                 // Is it a slab recipe?
-                // Must be a 3x1 recipe with all three items are the same and are an instance of ItemBlock
+                // Must be a 3x1 recipe with all three items are the same
                 if (sr.recipeWidth == 3 && sr.recipeHeight == 1) {
-                    Ingredient input = sr.recipeItems.get(0);
-                    if (!input.equals(Ingredient.EMPTY) 
-                        && (input.getMatchingStacks()[0].getItem() instanceof ItemBlock)
-                        && sr.recipeItems.get(1).equals(input)
+                    if (sr.recipeItems.get(1).equals(input)
                         && sr.recipeItems.get(2).equals(input)) {
                         // all three items are the same
                         // TODO: Consider also checking for word "slab" in output
@@ -62,10 +69,7 @@ public class StairSlabTweak extends Tweak {
                 }
                 // Is it a stair-shaped recipe?
                 if (sr.recipeWidth == 3 && sr.recipeHeight == 3) {
-                    Ingredient input = sr.recipeItems.get(0);
-                    if (!input.equals(Ingredient.EMPTY) 
-                        && (input.getMatchingStacks()[0].getItem() instanceof ItemBlock)
-                        && sr.recipeItems.get(1).equals(Ingredient.EMPTY) && sr.recipeItems.get(2).equals(Ingredient.EMPTY)
+                    if (sr.recipeItems.get(1).equals(Ingredient.EMPTY) && sr.recipeItems.get(2).equals(Ingredient.EMPTY)
                         && sr.recipeItems.get(3).equals(input) && sr.recipeItems.get(4).equals(input) && sr.recipeItems.get(5).equals(Ingredient.EMPTY)
                         && sr.recipeItems.get(6).equals(input) && sr.recipeItems.get(7).equals(input) && sr.recipeItems.get(8).equals(input)) {
                         // It's a left-side stair recipe
@@ -111,7 +115,9 @@ public class StairSlabTweak extends Tweak {
         recipeList.add(r);
 
         // Register shapeless 2x slab ==> material
-        Ingredient slab1 = Ingredient.fromItem(slab4.getItem());
+        ItemStack slab1stack = output.copy();
+        slab1stack.setCount(1);
+        Ingredient slab1 = Ingredient.fromStacks(slab1stack);
         ItemStack raw = input.getMatchingStacks()[0].copy();
         raw.setCount(1);
         if (raw.getItemDamage() == OreDictionary.WILDCARD_VALUE) {
@@ -137,7 +143,9 @@ public class StairSlabTweak extends Tweak {
         r.setRegistryName(new ResourceLocation(recipeName));
         recipeList.add(r);
         
-        Ingredient stair1 = Ingredient.fromItem(stair4.getItem());
+        ItemStack stair1stack = output.copy();
+        stair1stack.setCount(1);
+        Ingredient stair1 = Ingredient.fromStacks(stair1stack);
         ItemStack raw = input.getMatchingStacks()[0].copy();
         raw.setCount(3);
 
