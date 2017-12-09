@@ -29,13 +29,9 @@ public class PiTweaks {
 
     @net.minecraftforge.fml.common.Mod.EventHandler
     public void init(FMLInitializationEvent event) {
-
         for (Tweak t : loadedTweaks) {
             t.init(event);
         }
-
-        // net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(new PickupCheat());
-        // net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(new PumpkinPlaceTweak());
     }
 
     @net.minecraftforge.fml.common.Mod.EventHandler
@@ -68,7 +64,9 @@ public class PiTweaks {
         }
 
         if (cfg.getBoolean("enabled", "2x2-recipes", false, "Enables 2x2 versions of stair and slab recipes, and adds recipes to recombine them into their base blocks.")) {
-            tweaks.add(new StairSlabTweak());
+            boolean removeOld = cfg.getBoolean("removeOldRecipes", "2x2-recipes", true, "Removes 3x3 version of slab and stair recipes");
+            int doPlates = cfg.getInt("pressurePlates", "2x2-recipes", 1, 0, 1, "How to handle 2x2 stone and wooden pressure plate recipes. 0 = do nothing (use another recipe mod like minetweaker).  1 = change recipes to 2x1 slabs.");
+            tweaks.add(new StairSlabTweak(doPlates, removeOld));
         }
 
 

@@ -18,6 +18,15 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 public class StairSlabTweak extends Tweak {
 
+    int plateBehavior = 0;
+    boolean removeRecipes = false;
+
+    public StairSlabTweak(int pressurePlateBehavior, boolean removeOldRecipes) {
+        plateBehavior = pressurePlateBehavior;
+        removeRecipes = removeOldRecipes;
+    }
+
+    @Override
     public void postInit(net.minecraftforge.fml.common.event.FMLPostInitializationEvent event) {
     
         System.out.println("PiStairSlab: Searching for stair/slab recipes");
@@ -25,14 +34,16 @@ public class StairSlabTweak extends Tweak {
         java.util.List<IRecipe> recipesToRemove = new java.util.LinkedList<IRecipe>();
 
         // Replace the missing vanilla pressure plate recipes with ones that take slabs.
-        ResourceLocation rl = new ResourceLocation("pitweaks:recipe_stone_pressure_plate");
-        IRecipe r = new ShapedOreRecipe(rl, Blocks.STONE_PRESSURE_PLATE, "ss", 's', new ItemStack(Blocks.STONE_SLAB, 1, 0));
-        r.setRegistryName(rl);
-        recipesToAdd.add(r);
-        rl = new ResourceLocation("pitweaks:recipe_wooden_pressure_plate");
-        r = new ShapedOreRecipe(rl, Blocks.WOODEN_PRESSURE_PLATE, "ss", 's', "slabWood");
-        r.setRegistryName(rl);
-        recipesToAdd.add(r);
+        if (plateBehavior > 0) {
+            ResourceLocation rl = new ResourceLocation("pitweaks:recipe_stone_pressure_plate");
+            IRecipe r = new ShapedOreRecipe(rl, Blocks.STONE_PRESSURE_PLATE, "ss", 's', new ItemStack(Blocks.STONE_SLAB, 1, 0));
+            r.setRegistryName(rl);
+            recipesToAdd.add(r);
+            rl = new ResourceLocation("pitweaks:recipe_wooden_pressure_plate");
+            r = new ShapedOreRecipe(rl, Blocks.WOODEN_PRESSURE_PLATE, "ss", 's', "slabWood");
+            r.setRegistryName(rl);
+            recipesToAdd.add(r);
+        }
 
         // Search through recipes for stairs and slabs
         java.util.Iterator<IRecipe> recipeIter = ForgeRegistries.RECIPES.iterator();
@@ -82,14 +93,16 @@ public class StairSlabTweak extends Tweak {
             }
 
             // Remove the vanilla recipes for stone and wood pressure plates, as they now conflict
-            if (ir.getRecipeOutput().getItem() == Item.getItemFromBlock(Blocks.WOODEN_PRESSURE_PLATE)) {
-                System.out.println("PiStairSlab: Removing vanilla recipe for wooden pressure plate");
-                // TODO: Confirm that this was actually the conflicting recipe and not another one added elsewhere.
-                recipesToRemove.add(ir);
-            }
-            if (ir.getRecipeOutput().getItem() == Item.getItemFromBlock(Blocks.STONE_PRESSURE_PLATE)) {
-                System.out.println("PiStairSlab: Removing vanilla recipe for stone pressure plate");
-                recipesToRemove.add(ir);
+            if (plateBehavior > 0) {
+                if (ir.getRecipeOutput().getItem() == Item.getItemFromBlock(Blocks.WOODEN_PRESSURE_PLATE)) {
+                    System.out.println("PiStairSlab: Removing vanilla recipe for wooden pressure plate");
+                    // TODO: Confirm that this was actually the conflicting recipe and not another one added elsewhere.
+                    recipesToRemove.add(ir);
+                }
+                if (ir.getRecipeOutput().getItem() == Item.getItemFromBlock(Blocks.STONE_PRESSURE_PLATE)) {
+                    System.out.println("PiStairSlab: Removing vanilla recipe for stone pressure plate");
+                    recipesToRemove.add(ir);
+                }
             }
         }
 
@@ -97,9 +110,11 @@ public class StairSlabTweak extends Tweak {
         for (IRecipe ir : recipesToAdd) {
             ForgeRegistries.RECIPES.register(ir);
         }
-        for (IRecipe ir : recipesToRemove) {
-            // ((net.minecraftforge.registries.IForgeRegistryModifiable<IRecipe>)(ForgeRegistries.RECIPES)).remove(ir.getRegistryName());
-            ((net.minecraftforge.registries.IForgeRegistryModifiable<IRecipe>)(ForgeRegistries.RECIPES)).register(new NullRecipe(ir.getRegistryName()));
+        if (removeRecipes) {
+            for (IRecipe ir : recipesToRemove) {
+                // ((net.minecraftforge.registries.IForgeRegistryModifiable<IRecipe>)(ForgeRegistries.RECIPES)).remove(ir.getRegistryName());
+                ((net.minecraftforge.registries.IForgeRegistryModifiable<IRecipe>)(ForgeRegistries.RECIPES)).register(new NullRecipe(ir.getRegistryName()));
+            }
         }
     }
     
