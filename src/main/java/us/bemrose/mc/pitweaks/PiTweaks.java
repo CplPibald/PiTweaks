@@ -69,6 +69,9 @@ public class PiTweaks {
             tweaks.add(new StairSlabTweak(doPlates, removeOld));
         }
 
+        if (cfg.getBoolean("enabled", "spawnrequiresfullcube", false, "Mobs can only spawn on full-cube blocks.  Prevents spawning on partial blocks like slabs, stairs, and hoppers.")) {
+            tweaks.add(new SpawnOnCubeTweak());
+        }
 
         return tweaks;
     }
