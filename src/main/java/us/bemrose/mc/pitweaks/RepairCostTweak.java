@@ -26,7 +26,7 @@ public class RepairCostTweak extends Tweak {
     }
 
     static void clearRepairCost(ItemStack stack) {
-        if (!stack.isEmpty() && stack.hasTagCompound()) {
+        if (stack != null && stack.hasTagCompound()) {
             stack.getTagCompound().removeTag("RepairCost");
         }
     }

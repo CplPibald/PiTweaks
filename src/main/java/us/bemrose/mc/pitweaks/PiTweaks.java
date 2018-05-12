@@ -58,17 +58,6 @@ public class PiTweaks {
             tweaks.add(new FastBrewingTweak(time));
         }
 
-        if (cfg.getBoolean("enabled", "buoyantboats", false, "Boats float up flowing water instead of sinking.")) {
-            boolean dontEject = cfg.getBoolean("dontEjectPassengers", "buoyantboats", false, "Disables vanilla behavior of ejecting passengers from a boat after 3 seconds underwater.");
-            tweaks.add(new BuoyantBoatTweak(dontEject));
-        }
-
-        if (cfg.getBoolean("enabled", "2x2-recipes", false, "Enables 2x2 versions of stair and slab recipes, and adds recipes to recombine them into their base blocks.")) {
-            boolean removeOld = cfg.getBoolean("removeOldRecipes", "2x2-recipes", true, "Removes 3x3 version of slab and stair recipes");
-            int doPlates = cfg.getInt("pressurePlates", "2x2-recipes", 1, 0, 1, "How to handle 2x2 stone and wooden pressure plate recipes. 0 = do nothing (use another recipe mod like minetweaker).  1 = change recipes to 2x1 slabs.");
-            tweaks.add(new StairSlabTweak(doPlates, removeOld));
-        }
-
         if (cfg.getBoolean("enabled", "spawnrequiresfullcube", false, "Mobs can only spawn on full-cube blocks.  Prevents spawning on partial blocks like slabs, stairs, and hoppers.")) {
             tweaks.add(new SpawnOnCubeTweak());
         }
