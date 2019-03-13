@@ -45,7 +45,9 @@ public class PiTweaks {
         java.util.List<Tweak> tweaks = new java.util.LinkedList<Tweak>();
 
         if (cfg.getBoolean("enabled", "norepaircost", false, "Removes cumulative repair cost from anvils.")) {
-            tweaks.add(new RepairCostTweak());
+            boolean allowOverlevelBooks = cfg.getBoolean("allowOverlevelBooks", "norepaircost", true, "Allow books to be combined over the enchantment max level'");
+            boolean alwaysAllowBooks = cfg.getBoolean("alwaysAllowBooks", "norepaircost", true, "Always allow enchantments from books to be applied in an anvil, even if the enchantment doesn't make sense for the item'");
+            tweaks.add(new RepairCostTweak(true, allowOverlevelBooks, alwaysAllowBooks));
         }
 
         if (cfg.getBoolean("enabled", "fastfurnace", false, "Vanilla furnaces are faster.")) {
