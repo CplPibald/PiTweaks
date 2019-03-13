@@ -6,16 +6,6 @@ import net.minecraft.enchantment.EnchantmentHelper;
 
 public class RepairCostTweak extends Tweak {
 
-    public static boolean noRepairCost = true;
-    public static boolean allowOverlevelBooks = true;
-    public static boolean alwaysAllowBooks = true;
-
-    public RepairCostTweak(boolean nrc, boolean aob, boolean aab) {
-        noRepairCost = nrc;
-        allowOverlevelBooks = aob;
-        alwaysAllowBooks = aab;
-    }
-
     @Override
     public void init(net.minecraftforge.fml.common.event.FMLInitializationEvent event) {
         // Register for anvil events
@@ -30,7 +20,7 @@ public class RepairCostTweak extends Tweak {
         ItemStack left = event.getLeft();
 		ItemStack right = event.getRight();
 
-        if (noRepairCost) {
+        if (TweakConfig.anvil.noRepairCost) {
             clearRepairCost(left);
             clearRepairCost(right);
         }
@@ -41,7 +31,7 @@ public class RepairCostTweak extends Tweak {
         // if neither, revert to default book handling
         // Some code borrowed and adapted from Vazkii/Quark
         
-        if (!(alwaysAllowBooks || allowOverlevelBooks)) { return; }
+        if (!(TweakConfig.anvil.alwaysAllowBooks || TweakConfig.anvil.allowOverlevelBooks)) { return; }
 
 		if(!left.isEmpty() && !right.isEmpty() && net.minecraft.init.Items.ENCHANTED_BOOK == right.getItem()) {
 
@@ -64,7 +54,7 @@ public class RepairCostTweak extends Tweak {
 
                     int outLevel = (currentLevel == level) ? level + 1 : level;
 
-                    if (!allowOverlevelBooks) {
+                    if (!TweakConfig.anvil.allowOverlevelBooks) {
                         outLevel = Math.min(outLevel, ench.getMaxLevel());
                     }
 
@@ -93,7 +83,7 @@ public class RepairCostTweak extends Tweak {
     }
 
     static private boolean canApplyEnchant(ItemStack i, Enchantment e) {
-        if (alwaysAllowBooks) { return true; }
+        if (TweakConfig.anvil.alwaysAllowBooks) { return true; }
         if (net.minecraft.init.Items.ENCHANTED_BOOK == i.getItem()) { return true; }
         if (!e.canApply(i)) { return false; }
         for (Enchantment enchCompare : EnchantmentHelper.getEnchantments(i).keySet()) {
@@ -121,7 +111,7 @@ public class RepairCostTweak extends Tweak {
     // Fired when output item is taken from anvil
     @net.minecraftforge.fml.common.eventhandler.SubscribeEvent
     public void onAnvilUpdate(net.minecraftforge.event.entity.player.AnvilRepairEvent event)  {
-        if (noRepairCost) {
+        if (TweakConfig.anvil.noRepairCost) {
             clearRepairCost(event.getItemResult());
         }
     }

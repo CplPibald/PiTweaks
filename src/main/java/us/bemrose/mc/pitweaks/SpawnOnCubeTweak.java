@@ -6,9 +6,6 @@ import net.minecraft.block.Block;
 
 public class SpawnOnCubeTweak extends Tweak {
 
-    public SpawnOnCubeTweak() {
-    }
-
     @Override
     public void init(net.minecraftforge.fml.common.event.FMLInitializationEvent event) {
         net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(this);
@@ -17,6 +14,8 @@ public class SpawnOnCubeTweak extends Tweak {
     @net.minecraftforge.fml.common.eventhandler.SubscribeEvent
     public void onSpawnCheck(net.minecraftforge.event.entity.living.LivingSpawnEvent.CheckSpawn event) {
 
+        if (!TweakConfig.spawn.spawnRequiresFullCube) { return; }
+    
         BlockPos pos = event.getEntity().getPosition().down();
         IBlockState state = event.getWorld().getBlockState(pos);
 

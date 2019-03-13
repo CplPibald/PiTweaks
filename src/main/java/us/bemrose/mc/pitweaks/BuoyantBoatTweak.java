@@ -5,14 +5,6 @@ import net.minecraft.entity.item.EntityBoat;
 
 public class BuoyantBoatTweak extends Tweak {
 
-    public static boolean dontEjectPassengers = false;
-    
-    public BuoyantBoatTweak(boolean dep) {
-        // Code smell: setting static member from constructor.
-        // But hey, this is a singleton.
-        dontEjectPassengers = dep;
-    }
-
     @Override
     public void preInit(net.minecraftforge.fml.common.event.FMLPreInitializationEvent event) {
         // Register for events
@@ -30,9 +22,11 @@ public class BuoyantBoatTweak extends Tweak {
     public void onEntityJoinWorld(net.minecraftforge.event.entity.EntityJoinWorldEvent event) {
 
         // When a boat is placed, replace its entity with our own
-        if (!event.getWorld().isRemote && event.getEntity().getClass() == EntityBoat.class) {
-            event.getWorld().spawnEntity(new EntityBuoyantBoat((EntityBoat)event.getEntity()));
-            event.getEntity().setDead();
+        if (TweakConfig.boats.buoyantBoats) {
+            if (!event.getWorld().isRemote && event.getEntity().getClass() == EntityBoat.class) {
+                event.getWorld().spawnEntity(new EntityBuoyantBoat((EntityBoat)event.getEntity()));
+                event.getEntity().setDead();
+            }
         }
     }
 }

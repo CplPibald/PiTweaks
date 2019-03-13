@@ -9,8 +9,8 @@ public class TileEntityFastBrewingStand extends TileEntityBrewingStand {
     public void update()
     {
         final int brewTime_Field = 0;
-        if (this.getField(brewTime_Field) > FastBrewingTweak.maxBrewTicks) {
-            this.setField(brewTime_Field, FastBrewingTweak.maxBrewTicks);
+        if (this.getField(brewTime_Field) > TweakConfig.brewing.brewTicks) {
+            this.setField(brewTime_Field, TweakConfig.brewing.brewTicks);
         }
         super.update();
     }

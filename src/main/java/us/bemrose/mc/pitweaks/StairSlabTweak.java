@@ -18,23 +18,18 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 public class StairSlabTweak extends Tweak {
 
-    int plateBehavior = 0;
-    boolean removeRecipes = false;
-
-    public StairSlabTweak(int pressurePlateBehavior, boolean removeOldRecipes) {
-        plateBehavior = pressurePlateBehavior;
-        removeRecipes = removeOldRecipes;
-    }
-
     @Override
     public void postInit(net.minecraftforge.fml.common.event.FMLPostInitializationEvent event) {
+
+        // Must restart Minecraft to make any changes to this tweak
+        if (!TweakConfig.recipes.recipes2x2) { return; }
     
         System.out.println("PiStairSlab: Searching for stair/slab recipes");
         java.util.List<IRecipe> recipesToAdd = new java.util.LinkedList<IRecipe>();
         java.util.List<IRecipe> recipesToRemove = new java.util.LinkedList<IRecipe>();
 
         // Replace the missing vanilla pressure plate recipes with ones that take slabs.
-        if (plateBehavior > 0) {
+        if (TweakConfig.recipes.pressurePlateHandling > 0) {
             ResourceLocation rl = new ResourceLocation("pitweaks:recipe_stone_pressure_plate");
             IRecipe r = new ShapedOreRecipe(rl, Blocks.STONE_PRESSURE_PLATE, "ss", 's', new ItemStack(Blocks.STONE_SLAB, 1, 0));
             r.setRegistryName(rl);
@@ -93,7 +88,7 @@ public class StairSlabTweak extends Tweak {
             }
 
             // Remove the vanilla recipes for stone and wood pressure plates, as they now conflict
-            if (plateBehavior > 0) {
+            if (TweakConfig.recipes.pressurePlateHandling > 0) {
                 if (ir.getRecipeOutput().getItem() == Item.getItemFromBlock(Blocks.WOODEN_PRESSURE_PLATE)) {
                     System.out.println("PiStairSlab: Removing vanilla recipe for wooden pressure plate");
                     // TODO: Confirm that this was actually the conflicting recipe and not another one added elsewhere.
@@ -110,7 +105,7 @@ public class StairSlabTweak extends Tweak {
         for (IRecipe ir : recipesToAdd) {
             ForgeRegistries.RECIPES.register(ir);
         }
-        if (removeRecipes) {
+        if (TweakConfig.recipes.remove3x3Recipes) {
             for (IRecipe ir : recipesToRemove) {
                 // ((net.minecraftforge.registries.IForgeRegistryModifiable<IRecipe>)(ForgeRegistries.RECIPES)).remove(ir.getRegistryName());
                 ((net.minecraftforge.registries.IForgeRegistryModifiable<IRecipe>)(ForgeRegistries.RECIPES)).register(new NullRecipe(ir.getRegistryName()));
@@ -178,11 +173,10 @@ public class StairSlabTweak extends Tweak {
 }
 
 
-// TODO: Add configs
+// TODO:
 //   - exclude list
 //   - add list for new materials
 //   - switch to yield 2 stairs instead of 4
-//   - bool whether to remove 3x1 and 3x3 recipe when replacing
 
 class NullRecipe extends net.minecraftforge.registries.IForgeRegistryEntry.Impl<IRecipe> implements IRecipe {
     public NullRecipe(ResourceLocation res) { setRegistryName(res); }

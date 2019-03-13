@@ -20,8 +20,6 @@ public class EntityBuoyantBoat extends EntityBoat {
     // Vanilla applies a Y momentum of -0.0007D to any underwater boat.  This value is added to that to make it float.
     static final double BUOYANCY = 0.14D;
 
-    protected boolean dontEjectPassengers = false;
-
     // EntityBoat.Status prevStatus = EntityBoat.Status.IN_AIR;
     
     // If boat is underwater, add Y momentum to make it float instead of sink
@@ -52,7 +50,7 @@ public class EntityBuoyantBoat extends EntityBoat {
                 this.motionY += BUOYANCY;
 
                 // Vanilla boats eject passengers after counting 60 ticks underwater.
-                if (BuoyantBoatTweak.dontEjectPassengers) {
+                if (TweakConfig.boats.dontEjectPassengers) {
                     fs[outOfControlTicks_Field].setAccessible(true);
                     fs[outOfControlTicks_Field].setFloat(this, 0F);
                 }

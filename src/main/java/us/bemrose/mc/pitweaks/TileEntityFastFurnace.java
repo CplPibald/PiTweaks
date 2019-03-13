@@ -7,7 +7,7 @@ public class TileEntityFastFurnace extends TileEntityFurnace {
 
     @Override
     public int getCookTime(ItemStack stack) {
-        return 200 / FastFurnaceTweak.multiplier;
+        return 200 / TweakConfig.furnace.multiplier;
     }
 
     // Decrement burn time by multiplier ticks (minus one because TileEntityFurnace.update() decrements one)
@@ -17,7 +17,7 @@ public class TileEntityFastFurnace extends TileEntityFurnace {
 
         if (this.isBurning())
         {
-            this.setField(furnaceBurnTime_Field, this.getField(furnaceBurnTime_Field) - FastFurnaceTweak.multiplier + 1);
+            this.setField(furnaceBurnTime_Field, this.getField(furnaceBurnTime_Field) - TweakConfig.furnace.multiplier + 1);
         }
         super.update();
     }
