@@ -49,6 +49,7 @@ public class PiTweaks {
         tweaks.add(new BuoyantBoatTweak());
         tweaks.add(new StairSlabTweak());
         tweaks.add(new SpawnOnCubeTweak());
+        tweaks.add(new FoodCapTweak());
         
         return tweaks;
     }

@@ -73,6 +73,16 @@ public class TweakConfig {
         public boolean spawnRequiresFullCube = false;
     }
 
+    @Config.Comment("Tweaks to players")
+    public static PlayerTweakConfig player = new PlayerTweakConfig();
+    public static class PlayerTweakConfig {
+        @Config.Comment("Remove food cap that limits food value to 20. Useful with modded foods")
+        public boolean uncapFood = true;
+
+        @Config.Comment("Remove saturation cap that limits saturation to current food level")
+        public boolean uncapSaturation = false;
+    }
+
     @net.minecraftforge.fml.common.Mod.EventBusSubscriber(modid = PiTweaks.MODID)
 	private static class EventHandler {
 
