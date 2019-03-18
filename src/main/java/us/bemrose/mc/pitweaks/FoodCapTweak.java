@@ -9,6 +9,16 @@ public class FoodCapTweak extends Tweak {
 
     @Override
     public void init(net.minecraftforge.fml.common.event.FMLInitializationEvent event) {
+
+        // Disable this tweak if AppleCore is loaded, because it overloads foodstats
+        // TODO: Use AppleCore API when loaded.
+        if (net.minecraftforge.fml.common.Loader.isModLoaded("applecore")) {
+            if (TweakConfig.player.uncapFood || TweakConfig.player.uncapSaturation) { 
+                PiTweaks.LOGGER.warn("AppleCore detected.  Disabling food uncapper tweak.");
+            }
+            return;
+        }
+
         // Register block place event
         net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(this);
     }

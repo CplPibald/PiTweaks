@@ -10,11 +10,15 @@ public class PiTweaks {
     public static final String MODID = "pitweaks";
     public static final String VERSION = "BUILD_VERSION";
 
+    static org.apache.logging.log4j.Logger LOGGER = null;
+    
     java.util.List<Tweak> loadedTweaks;
     
     @net.minecraftforge.fml.common.Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
 
+        LOGGER = event.getModLog();
+    
         Configuration config = new Configuration(event.getSuggestedConfigurationFile());
         loadedTweaks = getTweakList(config);
 
