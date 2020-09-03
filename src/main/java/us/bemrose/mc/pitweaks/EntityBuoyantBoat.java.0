@@ -1,3 +1,4 @@
+/* 
 package us.bemrose.mc.pitweaks;
 
 import net.minecraft.entity.item.EntityBoat;
@@ -65,3 +66,4 @@ public class EntityBuoyantBoat extends EntityBoat {
     }
 
 }
+*/

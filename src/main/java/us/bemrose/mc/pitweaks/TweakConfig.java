@@ -1,98 +1,76 @@
 package us.bemrose.mc.pitweaks;
 
-import net.minecraftforge.common.config.Config;
+import net.minecraftforge.common.ForgeConfigSpec;
+import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 
-@Config(modid = PiTweaks.MODID)
+@net.minecraftforge.fml.common.Mod.EventBusSubscriber
 public class TweakConfig {
 
-    @Config.Comment("Tweaks to anvils")
-    public static AnvilTweakConfig anvil = new AnvilTweakConfig();
-    public static class AnvilTweakConfig {
-        @Config.Comment("Removes additional cost from repairing/enchanting items in an anvil multiple times")
-        public boolean noRepairCost = true;
+    public static ForgeConfigSpec commonConfig;
+    public static ForgeConfigSpec.BooleanValue   anvilNoRepairCost;
+    public static ForgeConfigSpec.BooleanValue   anvilOverlevelBooks;
+    public static ForgeConfigSpec.BooleanValue   anvilAlwaysAllowBooks;
+    public static ForgeConfigSpec.BooleanValue   furnaceEnabled;
+    public static ForgeConfigSpec.BooleanValue   blastFurnaceEnabled;
+    public static ForgeConfigSpec.BooleanValue   smokerEnabled;
+    public static ForgeConfigSpec.BooleanValue   campfireEnabled;
+    public static ForgeConfigSpec.IntValue       furnaceMultiplier;
+    public static ForgeConfigSpec.BooleanValue   brewingEnabled;
+    public static ForgeConfigSpec.IntValue       brewingTicks;
+    public static ForgeConfigSpec.BooleanValue   spawnFullCubeEnabled;
+    public static ForgeConfigSpec.BooleanValue   playerUncapFood;
+    public static ForgeConfigSpec.BooleanValue   playerUncapSaturation;
 
-        @Config.Comment("Allow books to be combined over the enchantment max level")
-        public boolean allowOverlevelBooks = true;
-        
-        @Config.Comment("Always allow enchantments from books to be applied in an anvil, regardless of item type or other enchantments")
-        public boolean alwaysAllowBooks = false;
+    public static void defineConfig(ForgeConfigSpec.Builder builder) {
+        builder.comment("Anvil Tweaks").push("anvil");
+        anvilNoRepairCost       = builder.comment("Removes additional cost from repairing/enchanting items in an anvil multiple times").define("noRepairCost", true);
+        anvilOverlevelBooks     = builder.comment("Allow books to be combined over the enchantment max level").define("allowOverlevelBooks", true);
+        anvilAlwaysAllowBooks   = builder.comment("Always allow enchantments from books to be applied in an anvil, regardless of item type or other enchantments").define("alwaysAllowBooks", false);
+        builder.pop();
+
+        builder.comment("Vanilla Machine Speed Tweaks").push("machines");
+        furnaceEnabled          = builder.comment("Vanilla furnaces are faster.  If you toggle this, you must break and re-place any furnaces.").define("fastFurnace", true);
+        blastFurnaceEnabled     = builder.comment("Vanilla blast furnaces are faster.  If you toggle this, you must break and re-place any blast furnaces.").define("fastBlastFurnace", true);
+        smokerEnabled           = builder.comment("Vanilla smokers are faster.  If you toggle this, you must break and re-place any smokers.").define("fastSmoker", true);
+        campfireEnabled         = builder.comment("Vanilla campfires cook faster.  If you toggle this, you must break and re-place any campfires.").define("fastCampfire", true);
+        furnaceMultiplier       = builder.comment("Cook speed multiplier for furnace, blast furnace, and smoker. Time per item is (10/multiplier) seconds. Valid values (2,4,5,8,10,20,25,40,50)").defineInRange("multiplier", 20, 2, 50);
+        brewingEnabled          = builder.comment("Brewing stands are faster.  If you toggle this, you must break and re-place any brewing stands.").define("fastBrewing", true);
+        brewingTicks            = builder.comment("Number of ticks to brew a potion.  Vanilla = 400.").defineInRange("brewTicks", 20, 2, 400);
+        builder.pop();
+
+        builder.comment("Spawning Tweaks").push("spawn");
+        spawnFullCubeEnabled    = builder.comment("Mobs can only spawn blocks with a full-cube collision box.  Prevents spawning on partial blocks like top-slabs, upside-down-stairs, and hoppers.").define("spawnRequiresFullCube", true);
+        builder.pop();
+
+        builder.comment("Hunger Tweaks").push("food");
+        playerUncapFood         = builder.comment("Remove food cap that limits food value to 20. Useful with modded foods").define("uncapFood", true);
+        playerUncapSaturation   = builder.comment("Remove saturation cap that limits saturation to current food level").define("uncapSaturation", true);
+        builder.pop();
     }
 
-    @Config.Comment("Tweaks to vanilla furnaces")
-    public static FurnaceTweakConfig furnace = new FurnaceTweakConfig();
-    public static class FurnaceTweakConfig {
-        @Config.Comment("Vanilla furnaces are faster.  If you toggle this, you must break and re-place any furnaces.")
-        public boolean fastFurnace = true;
+    static {
+        ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
+        defineConfig(builder);
+        commonConfig = builder.build();
+    }        
 
-        @Config.Comment("Cook speed multiplier. Time per item is (10/multiplier) seconds. Valid values (2,4,5,8,10,20,25,40,50,100)")
-        @Config.RangeInt(min = 1, max = 100)
-        public int multiplier = 20;
-    }
-    
-    @Config.Comment("Tweaks to vanilla brewing stands")
-    public static BrewingTweakConfig brewing = new BrewingTweakConfig();
-    public static class BrewingTweakConfig {
-        @Config.Comment("Brewing stands are faster.  If you toggle this, you must break and re-place any brewing stands.")
-        public boolean fastBrewing = true;
-        
-        @Config.Comment("Number of ticks to brew a potion.  Vanilla = 400.")
-        @Config.RangeInt(min = 1, max = 400)
-        public int brewTicks = 20;
+    public static void loadConfig(java.nio.file.Path path) {
+
+        CommentedFileConfig configData = CommentedFileConfig.builder(path)
+                .sync().autosave().writingMode(com.electronwill.nightconfig.core.io.WritingMode.REPLACE).build();
+
+        configData.load();
+        commonConfig.setConfig(configData);
     }
 
-    @Config.Comment("Tweaks to vanilla boats")
-    public static BoatTweakConfig boats = new BoatTweakConfig();
-    public static class BoatTweakConfig {
-        @Config.Comment("Boats float up flowing water instead of sinking.  If you toggle this, you must break and re-place any boats.")
-        public boolean buoyantBoats = true;
-        
-        @Config.Comment("Disables vanilla behavior of ejecting passengers from a boat after 3 seconds underwater. Requires buoyantBoats = true")
-        public boolean dontEjectPassengers = false;
-    }
-    
-    @Config.Comment("Tweaks to recipes")
-    public static RecipeTweakConfig recipes = new RecipeTweakConfig();
-    public static class RecipeTweakConfig {
-        @Config.Comment("Enables 2x2 versions of stair and slab recipes, and adds recipes to recombine them into their base blocks.")
-        @Config.RequiresMcRestart
-        public boolean recipes2x2 = false;
-        
-        @Config.Comment("Removes 3x3 version of slab and stair recipes when recipes2x2=true")
-        @Config.RequiresMcRestart
-        public boolean remove3x3Recipes = false;
-        
-        @Config.Comment("How to handle conflicts with 2x2 stone and wooden pressure plates when recipes2x2=true. 0 = do nothing (use another recipe mod like minetweaker).  1 = change plate recipes to use slabs.")
-        @Config.RequiresMcRestart
-        public int pressurePlateHandling = 0;
-    }
-    
-    @Config.Comment("Tweaks to mob spawning")
-    public static SpawnTweakConfig spawn = new SpawnTweakConfig();
-    public static class SpawnTweakConfig {
-        @Config.Comment("Mobs can only spawn on full-cube blocks.  Prevents spawning on partial blocks like top-slabs, upside-down-stairs, and hoppers.")
-        public boolean spawnRequiresFullCube = false;
-    }
+    // @SubscribeEvent
+    // public static void onLoad(final ModConfig.Loading configEvent) {
 
-    @Config.Comment("Tweaks to players")
-    public static PlayerTweakConfig player = new PlayerTweakConfig();
-    public static class PlayerTweakConfig {
-        @Config.Comment("Remove food cap that limits food value to 20. Useful with modded foods")
-        public boolean uncapFood = true;
+    // }
 
-        @Config.Comment("Remove saturation cap that limits saturation to current food level")
-        public boolean uncapSaturation = false;
-    }
+    // @SubscribeEvent
+    // public static void onReload(final ModConfig.ConfigReloading configEvent) {
 
-    @net.minecraftforge.fml.common.Mod.EventBusSubscriber(modid = PiTweaks.MODID)
-	private static class EventHandler {
+    // }
 
-		// Inject the new values and save to the config file when the config has been changed from the GUI.
-		@net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-		public static void onConfigChanged(final net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent event) {
-			if (event.getModID().equals(PiTweaks.MODID)) {
-				net.minecraftforge.common.config.ConfigManager.sync(PiTweaks.MODID, net.minecraftforge.common.config.Config.Type.INSTANCE);
-			}
-		}
-	}    
-    
 }

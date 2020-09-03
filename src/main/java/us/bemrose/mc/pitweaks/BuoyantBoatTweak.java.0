@@ -1,3 +1,4 @@
+/*
 package us.bemrose.mc.pitweaks;
 
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -30,3 +31,4 @@ public class BuoyantBoatTweak extends Tweak {
         }
     }
 }
+*/

@@ -7,33 +7,32 @@ import net.minecraft.enchantment.EnchantmentHelper;
 public class RepairCostTweak extends Tweak {
 
     @Override
-    public void init(net.minecraftforge.fml.common.event.FMLInitializationEvent event) {
+    public void setup(net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent event) {
         // Register for anvil events
         net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(this);
     }
 
     // AnvilUpdateEvent
     // Fired when an item is inserted into the anvil
-    @net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+    @net.minecraftforge.eventbus.api.SubscribeEvent
     public void onAnvilUpdate(net.minecraftforge.event.AnvilUpdateEvent event)  {
 
         ItemStack left = event.getLeft();
 		ItemStack right = event.getRight();
 
-        if (TweakConfig.anvil.noRepairCost) {
+        if (TweakConfig.anvilNoRepairCost.get()) {
             clearRepairCost(left);
             clearRepairCost(right);
         }
 
         // Override book handling
-        // if alwaysAllowBooks, then any book can be applied to any item
-        // if allowOverlevelBooks, then books can be applied for ever higher enchantments
+        // if anvilAlwaysAllowBooks, then any book can be applied to any item
+        // if anvilOverlevelBooks, then books can be applied for ever higher enchantments
         // if neither, revert to default book handling
-        // Some code borrowed and adapted from Vazkii/Quark
         
-        if (!(TweakConfig.anvil.alwaysAllowBooks || TweakConfig.anvil.allowOverlevelBooks)) { return; }
+        if (!(TweakConfig.anvilAlwaysAllowBooks.get() || TweakConfig.anvilOverlevelBooks.get())) { return; }
 
-		if(!left.isEmpty() && !right.isEmpty() && net.minecraft.init.Items.ENCHANTED_BOOK == right.getItem()) {
+		if(!left.isEmpty() && !right.isEmpty() && net.minecraft.item.Items.ENCHANTED_BOOK == right.getItem()) {
 
             int cost = 0;
             java.util.Map<Enchantment, Integer> currentEnchants = EnchantmentHelper.getEnchantments(left);
@@ -54,7 +53,7 @@ public class RepairCostTweak extends Tweak {
 
                     int outLevel = (currentLevel == level) ? level + 1 : level;
 
-                    if (!TweakConfig.anvil.allowOverlevelBooks) {
+                    if (!TweakConfig.anvilOverlevelBooks.get()) {
                         outLevel = Math.min(outLevel, ench.getMaxLevel());
                     }
 
@@ -69,8 +68,8 @@ public class RepairCostTweak extends Tweak {
                 ItemStack out = left.copy();
                 EnchantmentHelper.setEnchantments(currentEnchants, out);
                 String name = event.getName();
-                if(name != null && !name.isEmpty()){
-                    out.setStackDisplayName(name);
+                if(name != null && !name.isEmpty() && name != out.getDisplayName().getString()){
+                    out.setDisplayName(new net.minecraft.util.text.StringTextComponent(name));
                     cost++;
                 }
                 event.setOutput(out);
@@ -83,8 +82,8 @@ public class RepairCostTweak extends Tweak {
     }
 
     static private boolean canApplyEnchant(ItemStack i, Enchantment e) {
-        if (TweakConfig.anvil.alwaysAllowBooks) { return true; }
-        if (net.minecraft.init.Items.ENCHANTED_BOOK == i.getItem()) { return true; }
+        if (TweakConfig.anvilAlwaysAllowBooks.get()) { return true; }
+        if (net.minecraft.item.Items.ENCHANTED_BOOK == i.getItem()) { return true; }
         if (!e.canApply(i)) { return false; }
         for (Enchantment enchCompare : EnchantmentHelper.getEnchantments(i).keySet()) {
             if (enchCompare != null && enchCompare != e && !enchCompare.isCompatibleWith(e)) {
@@ -109,16 +108,16 @@ public class RepairCostTweak extends Tweak {
     
     // AnvilRepairEvent
     // Fired when output item is taken from anvil
-    @net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+    @net.minecraftforge.eventbus.api.SubscribeEvent
     public void onAnvilUpdate(net.minecraftforge.event.entity.player.AnvilRepairEvent event)  {
-        if (TweakConfig.anvil.noRepairCost) {
+        if (TweakConfig.anvilNoRepairCost.get()) {
             clearRepairCost(event.getItemResult());
         }
     }
 
     static void clearRepairCost(ItemStack stack) {
-        if (!stack.isEmpty() && stack.hasTagCompound()) {
-            stack.getTagCompound().removeTag("RepairCost");
+        if (!stack.isEmpty() && stack.hasTag()) {
+            stack.removeChildTag("RepairCost");
         }
     }
 }

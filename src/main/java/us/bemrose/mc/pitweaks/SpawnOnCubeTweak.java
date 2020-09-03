@@ -1,27 +1,37 @@
 package us.bemrose.mc.pitweaks;
 
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Block;
 
 public class SpawnOnCubeTweak extends Tweak {
 
     @Override
-    public void init(net.minecraftforge.fml.common.event.FMLInitializationEvent event) {
-        net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(this);
+    public void setup(net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent event) {
+
+        // For reload support, always register here and check on event fire
+        if (TweakConfig.spawnFullCubeEnabled.get()) { 
+            net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(this);
+        }
     }
     
-    @net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+    @net.minecraftforge.eventbus.api.SubscribeEvent
     public void onSpawnCheck(net.minecraftforge.event.entity.living.LivingSpawnEvent.CheckSpawn event) {
 
-        if (!TweakConfig.spawn.spawnRequiresFullCube) { return; }
+        // Need to check this here to enable changing in-game...
+        // but Forge 1.15 doesn't support reload anyway
+        // if (!TweakConfig.spawnFullCubeEnabled.get()) { return; }
     
         BlockPos pos = event.getEntity().getPosition().down();
-        IBlockState state = event.getWorld().getBlockState(pos);
+        BlockState state = event.getWorld().getBlockState(pos);
 
-        // Cancel the spawn if the block below has a collision box, but is not a full cube
-        if(!(state.isFullCube() || state.getCollisionBoundingBox(event.getWorld(), pos) == Block.NULL_AABB)) {
-            event.setResult(net.minecraftforge.fml.common.eventhandler.Event.Result.DENY);
+        boolean isFullCube = (state.getCollisionShape(event.getWorld(), pos) == net.minecraft.util.math.shapes.VoxelShapes.fullCube());
+
+        // Allow the spawn if the block below has a collision box that is not a full cube.
+        // always allow spawner spawns
+        // Cancel if neither of these applies.
+        if(!(isFullCube || event.isSpawner())) {
+            event.setResult(net.minecraftforge.eventbus.api.Event.Result.DENY);
         }
     }
 }
