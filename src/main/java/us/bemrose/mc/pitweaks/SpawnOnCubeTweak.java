@@ -28,9 +28,9 @@ public class SpawnOnCubeTweak extends Tweak {
         boolean isFullCube = (state.getCollisionShape(event.getWorld(), pos) == net.minecraft.util.math.shapes.VoxelShapes.fullCube());
 
         // Allow the spawn if the block below has a collision box that is not a full cube.
-        // always allow spawner spawns
-        // Cancel if neither of these applies.
-        if(!(isFullCube || event.isSpawner())) {
+        // always allow spawner spawns and spawns in water
+        // Otherwise cancel.
+        if(!(isFullCube || event.isSpawner()) && state.getFluidState().isEmpty()) {
             event.setResult(net.minecraftforge.eventbus.api.Event.Result.DENY);
         }
     }
