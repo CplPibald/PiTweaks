@@ -30,9 +30,10 @@ public class RepairCostTweak extends Tweak {
         // if anvilOverlevelBooks, then books can be applied for ever higher enchantments
         // if neither, revert to default book handling
         
+        if (left.isEmpty() || right.isEmpty()) { return; }
         if (!(TweakConfig.anvilAlwaysAllowBooks.get() || TweakConfig.anvilOverlevelBooks.get())) { return; }
 
-		if(!left.isEmpty() && !right.isEmpty() && net.minecraft.item.Items.ENCHANTED_BOOK == right.getItem()) {
+		if(net.minecraft.item.Items.ENCHANTED_BOOK == right.getItem()) {
 
             int cost = 0;
             java.util.Map<Enchantment, Integer> currentEnchants = EnchantmentHelper.getEnchantments(left);
@@ -79,6 +80,52 @@ public class RepairCostTweak extends Tweak {
                 event.setCanceled(true);
             }
         }
+
+        // Disenchant item, if right side is an empty book
+        else if(TweakConfig.anvilDisenchant.get() && net.minecraft.item.Items.BOOK == right.getItem()) {
+
+            net.minecraft.nbt.ListNBT enchTags = left.getEnchantmentTagList();
+            if (!enchTags.isEmpty()) {
+
+                ItemStack out = left.copy();
+                net.minecraft.nbt.ListNBT newTags = enchTags.copy();
+                newTags.remove(0);
+                out.setTagInfo("Enchantments", newTags);
+
+                net.minecraft.nbt.CompoundNBT ench = enchTags.getCompound(0);
+                int cost = getApplyCost(getEnchantmentFromStringId(ench.getString("id")), 1);
+
+                event.setOutput(out);
+                event.setCost(cost);
+                event.setMaterialCost(1);
+            }
+        }
+    }
+
+    // AnvilRepairEvent
+    // Fired when output item is taken from anvil
+    @net.minecraftforge.eventbus.api.SubscribeEvent
+    public void onAnvilUpdate(net.minecraftforge.event.entity.player.AnvilRepairEvent event)  {
+        if (TweakConfig.anvilNoRepairCost.get()) {
+            clearRepairCost(event.getItemResult());
+        }
+        event.setBreakChance(TweakConfig.anvilBreakChance.get().floatValue());
+
+        if(TweakConfig.anvilDisenchant.get() && net.minecraft.item.Items.BOOK == event.getIngredientInput().getItem()) {
+            ItemStack left = event.getItemInput();
+            net.minecraft.nbt.ListNBT enchTags = left.getEnchantmentTagList();
+            if (!enchTags.isEmpty()) {
+                net.minecraft.nbt.CompoundNBT ench = enchTags.getCompound(0);
+
+                ItemStack book = new ItemStack(net.minecraft.item.Items.ENCHANTED_BOOK);
+                net.minecraft.nbt.ListNBT newTags = new net.minecraft.nbt.ListNBT();
+                newTags.add(ench);
+                book.getOrCreateTag().put("StoredEnchantments", newTags);
+
+                net.minecraft.entity.player.PlayerEntity player = event.getPlayer();
+                net.minecraft.inventory.InventoryHelper.spawnItemStack(player.world, player.getPosX(), player.getPosY(), player.getPosZ(), book);
+            }
+        }
     }
 
     static private boolean canApplyEnchant(ItemStack i, Enchantment e) {
@@ -105,16 +152,11 @@ public class RepairCostTweak extends Tweak {
         
         return rarityFactor * lvl;
     }
-    
-    // AnvilRepairEvent
-    // Fired when output item is taken from anvil
-    @net.minecraftforge.eventbus.api.SubscribeEvent
-    public void onAnvilUpdate(net.minecraftforge.event.entity.player.AnvilRepairEvent event)  {
-        if (TweakConfig.anvilNoRepairCost.get()) {
-            clearRepairCost(event.getItemResult());
-        }
-    }
 
+    static private Enchantment getEnchantmentFromStringId(String id) {
+        return net.minecraft.util.registry.Registry.ENCHANTMENT.getValue(net.minecraft.util.ResourceLocation.tryCreate(id)).get();
+    }
+    
     static void clearRepairCost(ItemStack stack) {
         if (!stack.isEmpty() && stack.hasTag()) {
             stack.removeChildTag("RepairCost");

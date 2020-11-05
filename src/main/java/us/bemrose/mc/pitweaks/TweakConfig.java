@@ -10,6 +10,8 @@ public class TweakConfig {
     public static ForgeConfigSpec.BooleanValue   anvilNoRepairCost;
     public static ForgeConfigSpec.BooleanValue   anvilOverlevelBooks;
     public static ForgeConfigSpec.BooleanValue   anvilAlwaysAllowBooks;
+    public static ForgeConfigSpec.BooleanValue   anvilDisenchant;
+    public static ForgeConfigSpec.DoubleValue    anvilBreakChance;
     public static ForgeConfigSpec.BooleanValue   furnaceEnabled;
     public static ForgeConfigSpec.BooleanValue   blastFurnaceEnabled;
     public static ForgeConfigSpec.BooleanValue   smokerEnabled;
@@ -26,6 +28,8 @@ public class TweakConfig {
         anvilNoRepairCost       = builder.comment("Removes additional cost from repairing/enchanting items in an anvil multiple times").define("noRepairCost", true);
         anvilOverlevelBooks     = builder.comment("Allow books to be combined over the enchantment max level").define("allowOverlevelBooks", true);
         anvilAlwaysAllowBooks   = builder.comment("Always allow enchantments from books to be applied in an anvil, regardless of item type or other enchantments").define("alwaysAllowBooks", false);
+        anvilDisenchant         = builder.comment("Enables disenchanting items by combining with a vanilla book").define("disenchant", true);
+        anvilBreakChance        = builder.comment("Chance for an anvil to be damaged on use (default 0.12)").defineInRange("breakChance", 0.12, 0.0, 1.0);
         builder.pop();
 
         builder.comment("Vanilla Machine Speed Tweaks").push("machines");

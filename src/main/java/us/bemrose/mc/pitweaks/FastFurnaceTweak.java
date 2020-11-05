@@ -3,6 +3,12 @@ package us.bemrose.mc.pitweaks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.block.Blocks;
 import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.tileentity.FurnaceTileEntity;
+import net.minecraft.tileentity.BlastFurnaceTileEntity;
+import net.minecraft.tileentity.SmokerTileEntity;
+import net.minecraft.tileentity.CampfireTileEntity;
+import net.minecraft.tileentity.BrewingStandTileEntity;
+import net.minecraft.nbt.CompoundNBT;
 
 public class FastFurnaceTweak extends Tweak {
 
@@ -18,6 +24,8 @@ public class FastFurnaceTweak extends Tweak {
         bus.register(TileEntityFastFurnace.class);
     }
 
+    // public static final TileEntityType<TileEntityFastFurnace> FASTFURNACE = register("furnace", TileEntityType.Builder.create(FurnaceTileEntity::new, Blocks.FURNACE));
+
     @net.minecraftforge.eventbus.api.SubscribeEvent
     public static void onTETRegistration(final net.minecraftforge.event.RegistryEvent.Register<TileEntityType<?>> event) {
         event.getRegistry().register(TileEntityType.Builder.create(TileEntityFastFurnace::new, Blocks.FURNACE).build(null).setRegistryName("pitweaks:fastfurnace"));
@@ -26,34 +34,52 @@ public class FastFurnaceTweak extends Tweak {
         event.getRegistry().register(TileEntityType.Builder.create(TileEntityFastCampfire::new, Blocks.CAMPFIRE).build(null).setRegistryName("pitweaks:fastcampfire"));
     }
 
-    // BlockEvent
     @net.minecraftforge.eventbus.api.SubscribeEvent
-    public void onBlockPlaced(net.minecraftforge.event.world.BlockEvent.EntityPlaceEvent event) {
+    public void onBlockClicked(net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock event) {
 
-        // When a furnace is placed, replace its tile entity with our own
+        net.minecraft.util.math.BlockPos pos = event.getPos();
+        net.minecraft.world.World world = event.getWorld();
+        net.minecraft.block.Block block = world.getBlockState(pos).getBlock();
+
+        // When a furnace is placed, replace its TE with our own
         if (TweakConfig.furnaceEnabled.get()) {
-            if (event.getPlacedBlock().getBlock() == Blocks.FURNACE) {
-                event.getWorld().getWorld().setTileEntity(event.getBlockSnapshot().getPos(), new TileEntityFastFurnace());
+            if (block == Blocks.FURNACE) {
+                net.minecraft.tileentity.TileEntity te = world.getTileEntity(pos);
+                if (te.getClass() == FurnaceTileEntity.class ) {
+                    world.setTileEntity(event.getPos(), new TileEntityFastFurnace((FurnaceTileEntity)te));
+                }
             }
-        }
+        } 
         if (TweakConfig.blastFurnaceEnabled.get()) {
-            if (event.getPlacedBlock().getBlock() == Blocks.BLAST_FURNACE) {
-                event.getWorld().getWorld().setTileEntity(event.getBlockSnapshot().getPos(), new TileEntityFastBlastFurnace());
+            if (block == Blocks.BLAST_FURNACE) {
+                net.minecraft.tileentity.TileEntity te = world.getTileEntity(pos);
+                if (te.getClass() == BlastFurnaceTileEntity.class) {
+                    world.setTileEntity(event.getPos(), new TileEntityFastBlastFurnace((BlastFurnaceTileEntity)te));
+                }
             }
         }
         if (TweakConfig.smokerEnabled.get()) {
-            if (event.getPlacedBlock().getBlock() == Blocks.SMOKER) {
-                event.getWorld().getWorld().setTileEntity(event.getBlockSnapshot().getPos(), new TileEntityFastSmoker());
+            if (block == Blocks.SMOKER) {
+                net.minecraft.tileentity.TileEntity te = world.getTileEntity(pos);
+                if (te.getClass() == SmokerTileEntity.class) {
+                    world.setTileEntity(event.getPos(), new TileEntityFastSmoker((SmokerTileEntity)te));
+                }
             }
         }
         if (TweakConfig.campfireEnabled.get()) {
-            if (event.getPlacedBlock().getBlock() == Blocks.CAMPFIRE) {
-                event.getWorld().getWorld().setTileEntity(event.getBlockSnapshot().getPos(), new TileEntityFastCampfire());
+            if (block == Blocks.CAMPFIRE) {
+                net.minecraft.tileentity.TileEntity te = world.getTileEntity(pos);
+                if (te.getClass() == CampfireTileEntity.class) {
+                    world.setTileEntity(event.getPos(), new TileEntityFastCampfire((CampfireTileEntity)te));
+                }
             }
         }
         if (TweakConfig.brewingEnabled.get()) {
-            if (event.getPlacedBlock().getBlock() == Blocks.BREWING_STAND) {
-                event.getWorld().getWorld().setTileEntity(event.getBlockSnapshot().getPos(), new TileEntityFastBrewingStand());
+            if (block == Blocks.BREWING_STAND) {
+                net.minecraft.tileentity.TileEntity te = world.getTileEntity(pos);
+                if (te.getClass() == BrewingStandTileEntity.class) {
+                    world.setTileEntity(event.getPos(), new TileEntityFastBrewingStand((BrewingStandTileEntity)te));
+                }
             }
         }
     }
@@ -61,7 +87,24 @@ public class FastFurnaceTweak extends Tweak {
     // @=====
     // Furnace
     //
-    public static class TileEntityFastFurnace extends net.minecraft.tileentity.FurnaceTileEntity {
+    // public class BlockFastFurnace extends net.minecraft.block.FurnaceBlock {
+        // public BlockFastFurnace() { super(net.minecraft.block.Block.Properties.create(net.minecraft.block.material.Material.ROCK)); }
+
+        // @Override
+        // public boolean hasTileEntity(net.minecraft.block.BlockState state) { return true; }
+
+        // @Override
+        // public net.minecraft.tileentity.TileEntity createTileEntity(net.minecraft.block.BlockState state, net.minecraft.world.IBlockReader world) {return new TileEntityFastFurnace();}
+    // }
+
+    public static class TileEntityFastFurnace extends FurnaceTileEntity {
+
+        public TileEntityFastFurnace() {};
+        public TileEntityFastFurnace(FurnaceTileEntity te) {
+            CompoundNBT nbt = new CompoundNBT();
+            te.write(nbt);
+            read(nbt);
+        }
 
         @Override
         protected int getCookTime() {
@@ -83,7 +126,14 @@ public class FastFurnaceTweak extends Tweak {
     // @=====
     // Blast Furnace
     //
-    public static class TileEntityFastBlastFurnace extends net.minecraft.tileentity.BlastFurnaceTileEntity {
+    public static class TileEntityFastBlastFurnace extends BlastFurnaceTileEntity {
+
+        public TileEntityFastBlastFurnace() {};
+        public TileEntityFastBlastFurnace(BlastFurnaceTileEntity te) {
+            CompoundNBT nbt = new CompoundNBT();
+            te.write(nbt);
+            read(nbt);
+        }
 
         @Override
         protected int getCookTime() {
@@ -105,7 +155,14 @@ public class FastFurnaceTweak extends Tweak {
     // @=====
     // Smoker
     //
-    public static class TileEntityFastSmoker extends net.minecraft.tileentity.SmokerTileEntity {
+    public static class TileEntityFastSmoker extends SmokerTileEntity {
+
+        public TileEntityFastSmoker() {};
+        public TileEntityFastSmoker(SmokerTileEntity te) {
+            CompoundNBT nbt = new CompoundNBT();
+            te.write(nbt);
+            read(nbt);
+        }
 
         @Override
         protected int getCookTime() {
@@ -126,7 +183,14 @@ public class FastFurnaceTweak extends Tweak {
     // @=====
     // Campfire
     //
-    public static class TileEntityFastCampfire extends net.minecraft.tileentity.CampfireTileEntity {
+    public static class TileEntityFastCampfire extends CampfireTileEntity {
+
+        public TileEntityFastCampfire() {};
+        public TileEntityFastCampfire(CampfireTileEntity te) {
+            CompoundNBT nbt = new CompoundNBT();
+            te.write(nbt);
+            read(nbt);
+        }
 
         // Add four extra ticks to cookingTimes, to make campfires hardcoded at 5x speed (items take 6 seconds)
         @Override
@@ -146,7 +210,14 @@ public class FastFurnaceTweak extends Tweak {
     // @=====
     // Brewing Stand
     //
-    public class TileEntityFastBrewingStand extends net.minecraft.tileentity.BrewingStandTileEntity {
+    public class TileEntityFastBrewingStand extends BrewingStandTileEntity {
+
+        public TileEntityFastBrewingStand() {};
+        public TileEntityFastBrewingStand(BrewingStandTileEntity te) {
+            CompoundNBT nbt = new CompoundNBT();
+            te.write(nbt);
+            read(nbt);
+        }
 
         @Override
         public void tick()
