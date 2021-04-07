@@ -20,8 +20,11 @@ public class TweakConfig {
     public static ForgeConfigSpec.BooleanValue   brewingEnabled;
     public static ForgeConfigSpec.IntValue       brewingTicks;
     public static ForgeConfigSpec.BooleanValue   spawnFullCubeEnabled;
+    public static ForgeConfigSpec.BooleanValue   allowPhantoms;
+    public static ForgeConfigSpec.BooleanValue   noInvulnerabilityTicks;
     public static ForgeConfigSpec.BooleanValue   playerUncapFood;
     public static ForgeConfigSpec.BooleanValue   playerUncapSaturation;
+    public static ForgeConfigSpec.BooleanValue   instantLeafDecay;
 
     public static void defineConfig(ForgeConfigSpec.Builder builder) {
         builder.comment("Anvil Tweaks").push("anvil");
@@ -42,14 +45,21 @@ public class TweakConfig {
         brewingTicks            = builder.comment("Number of ticks to brew a potion.  Vanilla = 400.").defineInRange("brewTicks", 20, 2, 400);
         builder.pop();
 
-        builder.comment("Spawning Tweaks").push("spawn");
+        builder.comment("Entity Tweaks").push("entity");
         spawnFullCubeEnabled    = builder.comment("Mobs can only spawn blocks with a full-cube collision box.  Prevents spawning on partial blocks like top-slabs, upside-down-stairs, and hoppers.").define("spawnRequiresFullCube", true);
+        allowPhantoms           = builder.comment("Set to false to disable phantom spawns.").define("allowPhantoms", true);
+        noInvulnerabilityTicks  = builder.comment("Removes 0.5 sec invulnerability time after an entity gets hit.").define("noInvulnerabilityTicks", false);
         builder.pop();
 
         builder.comment("Hunger Tweaks").push("food");
         playerUncapFood         = builder.comment("Remove food cap that limits food value to 20. Useful with modded foods").define("uncapFood", true);
         playerUncapSaturation   = builder.comment("Remove saturation cap that limits saturation to current food level").define("uncapSaturation", true);
         builder.pop();
+
+        builder.comment("Plant Tweaks").push("plant");
+        instantLeafDecay        = builder.comment("Leaves decay immediately when their supporting tree is removed").define("instantLeafDecay", true);
+        builder.pop();
+
     }
 
     static {

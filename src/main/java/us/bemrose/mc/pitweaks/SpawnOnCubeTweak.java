@@ -10,7 +10,7 @@ public class SpawnOnCubeTweak extends Tweak {
     public void setup(net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent event) {
 
         // For reload support, always register here and check on event fire
-        if (TweakConfig.spawnFullCubeEnabled.get()) { 
+        if (TweakConfig.spawnFullCubeEnabled.get() || TweakConfig.noInvulnerabilityTicks.get() || !TweakConfig.allowPhantoms.get()) { 
             net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(this);
         }
     }
@@ -18,20 +18,36 @@ public class SpawnOnCubeTweak extends Tweak {
     @net.minecraftforge.eventbus.api.SubscribeEvent
     public void onSpawnCheck(net.minecraftforge.event.entity.living.LivingSpawnEvent.CheckSpawn event) {
 
-        // Need to check this here to enable changing in-game...
-        // but Forge 1.15 doesn't support reload anyway
-        // if (!TweakConfig.spawnFullCubeEnabled.get()) { return; }
-    
-        BlockPos pos = event.getEntity().getPosition().down();
-        BlockState state = event.getWorld().getBlockState(pos);
+        if (event.isSpawner()) { return; }
 
-        boolean isFullCube = (state.getCollisionShape(event.getWorld(), pos) == net.minecraft.util.math.shapes.VoxelShapes.fullCube());
+        boolean doSpawn = true;
+        if (TweakConfig.spawnFullCubeEnabled.get()) {
+            BlockPos pos = event.getEntity().blockPosition().below();
+            BlockState state = event.getWorld().getBlockState(pos);
 
-        // Allow the spawn if the block below has a collision box that is not a full cube.
-        // always allow spawner spawns and spawns in water
-        // Otherwise cancel.
-        if(!(isFullCube || event.isSpawner()) && state.getFluidState().isEmpty()) {
+            boolean isFullCube = state.isCollisionShapeFullBlock(event.getWorld(), pos);
+            // block spawn unless block underneath is:
+            //   full cube
+            //   air
+            //   waterlogged
+            if (!isFullCube && !state.isAir() && state.getFluidState().isEmpty()) {
+                doSpawn = false;
+            }
+        }
+
+        if (!TweakConfig.allowPhantoms.get() && event.getEntity().getType() == net.minecraft.entity.EntityType.PHANTOM) {
+            doSpawn = false;
+        }
+
+        if(!doSpawn) {
             event.setResult(net.minecraftforge.eventbus.api.Event.Result.DENY);
+        }
+    }
+
+    @net.minecraftforge.eventbus.api.SubscribeEvent
+    public void onLivingHurt(net.minecraftforge.event.entity.living.LivingHurtEvent event) {
+        if (TweakConfig.noInvulnerabilityTicks.get()) {
+            event.getEntityLiving().invulnerableTime = 0;
         }
     }
 }

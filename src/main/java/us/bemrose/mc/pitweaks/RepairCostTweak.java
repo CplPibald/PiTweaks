@@ -70,7 +70,7 @@ public class RepairCostTweak extends Tweak {
                 EnchantmentHelper.setEnchantments(currentEnchants, out);
                 String name = event.getName();
                 if(name != null && !name.isEmpty() && name != out.getDisplayName().getString()){
-                    out.setDisplayName(new net.minecraft.util.text.StringTextComponent(name));
+                    out.setHoverName(new net.minecraft.util.text.StringTextComponent(name));
                     cost++;
                 }
                 event.setOutput(out);
@@ -84,13 +84,13 @@ public class RepairCostTweak extends Tweak {
         // Disenchant item, if right side is an empty book
         else if(TweakConfig.anvilDisenchant.get() && net.minecraft.item.Items.BOOK == right.getItem()) {
 
-            net.minecraft.nbt.ListNBT enchTags = left.getEnchantmentTagList();
+            net.minecraft.nbt.ListNBT enchTags = left.getEnchantmentTags();
             if (!enchTags.isEmpty()) {
 
                 ItemStack out = left.copy();
                 net.minecraft.nbt.ListNBT newTags = enchTags.copy();
                 newTags.remove(0);
-                out.setTagInfo("Enchantments", newTags);
+                out.addTagElement("Enchantments", newTags);
 
                 net.minecraft.nbt.CompoundNBT ench = enchTags.getCompound(0);
                 int cost = getApplyCost(getEnchantmentFromStringId(ench.getString("id")), 1);
@@ -113,7 +113,7 @@ public class RepairCostTweak extends Tweak {
 
         if(TweakConfig.anvilDisenchant.get() && net.minecraft.item.Items.BOOK == event.getIngredientInput().getItem()) {
             ItemStack left = event.getItemInput();
-            net.minecraft.nbt.ListNBT enchTags = left.getEnchantmentTagList();
+            net.minecraft.nbt.ListNBT enchTags = left.getEnchantmentTags();
             if (!enchTags.isEmpty()) {
                 net.minecraft.nbt.CompoundNBT ench = enchTags.getCompound(0);
 
@@ -123,7 +123,7 @@ public class RepairCostTweak extends Tweak {
                 book.getOrCreateTag().put("StoredEnchantments", newTags);
 
                 net.minecraft.entity.player.PlayerEntity player = event.getPlayer();
-                net.minecraft.inventory.InventoryHelper.spawnItemStack(player.world, player.getPosX(), player.getPosY(), player.getPosZ(), book);
+                net.minecraft.inventory.InventoryHelper.dropItemStack(player.level, player.getX(), player.getY(), player.getZ(), book);
             }
         }
     }
@@ -131,7 +131,7 @@ public class RepairCostTweak extends Tweak {
     static private boolean canApplyEnchant(ItemStack i, Enchantment e) {
         if (TweakConfig.anvilAlwaysAllowBooks.get()) { return true; }
         if (net.minecraft.item.Items.ENCHANTED_BOOK == i.getItem()) { return true; }
-        if (!e.canApply(i)) { return false; }
+        if (!e.canEnchant(i)) { return false; }
         for (Enchantment enchCompare : EnchantmentHelper.getEnchantments(i).keySet()) {
             if (enchCompare != null && enchCompare != e && !enchCompare.isCompatibleWith(e)) {
                 return false;
@@ -154,12 +154,12 @@ public class RepairCostTweak extends Tweak {
     }
 
     static private Enchantment getEnchantmentFromStringId(String id) {
-        return net.minecraft.util.registry.Registry.ENCHANTMENT.getValue(net.minecraft.util.ResourceLocation.tryCreate(id)).get();
+        return net.minecraft.util.registry.Registry.ENCHANTMENT.get(net.minecraft.util.ResourceLocation.tryParse(id));
     }
     
     static void clearRepairCost(ItemStack stack) {
         if (!stack.isEmpty() && stack.hasTag()) {
-            stack.removeChildTag("RepairCost");
+            stack.removeTagKey("RepairCost");
         }
     }
 }

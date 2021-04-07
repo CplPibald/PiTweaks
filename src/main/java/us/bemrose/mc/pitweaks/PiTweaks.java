@@ -39,8 +39,8 @@ public class PiTweaks {
         new RepairCostTweak(),
         new FastFurnaceTweak(),
         new SpawnOnCubeTweak(),
-        new FoodCapTweak()
-        // new BuoyantBoatTweak() // probably not doing this one
+        new FoodCapTweak(),
+        new ForestTweak()
     );
 }
 

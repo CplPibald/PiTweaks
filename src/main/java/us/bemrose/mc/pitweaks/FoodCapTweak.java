@@ -30,10 +30,10 @@ public class FoodCapTweak extends Tweak {
         
         if (event.getEntity() instanceof PlayerEntity){
             PlayerEntity player = (PlayerEntity) event.getEntity();
-            FoodStats oldStats = player.getFoodStats();
+            FoodStats oldStats = player.getFoodData();
 
             if (null != oldStats && !(oldStats instanceof TweakFoodStats)) {
-                player.foodStats = new TweakFoodStats(oldStats);
+                player.foodData = new TweakFoodStats(oldStats);
             }
         }
     }
@@ -42,21 +42,21 @@ public class FoodCapTweak extends Tweak {
 
         public TweakFoodStats(FoodStats fsIn) {
             CompoundNBT nbt = new CompoundNBT();
-            fsIn.write(nbt);
-            read(nbt);
+            fsIn.addAdditionalSaveData(nbt);
+            readAdditionalSaveData(nbt);
         }
 
         @Override
-        public void addStats(int foodLevelIn, float foodSaturationModifier) {
+        public void eat(int foodLevelIn, float foodSaturationModifier) {
 
             foodLevel += foodLevelIn;
-            foodSaturationLevel += (float)foodLevelIn * foodSaturationModifier * 2.0F;
+            saturationLevel += (float)foodLevelIn * foodSaturationModifier * 2.0F;
                 
             if (!TweakConfig.playerUncapFood.get()) {
                 foodLevel = Math.min(foodLevel, 20);
             }
             if (!TweakConfig.playerUncapSaturation.get()) {
-                foodSaturationLevel = Math.min(foodSaturationLevel, foodLevel);
+                saturationLevel = Math.min(saturationLevel, foodLevel);
             }
         }
     }
