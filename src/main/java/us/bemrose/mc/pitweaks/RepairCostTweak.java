@@ -84,13 +84,21 @@ public class RepairCostTweak extends Tweak {
         // Disenchant item, if right side is an empty book
         else if(TweakConfig.anvilDisenchant.get() && net.minecraft.item.Items.BOOK == right.getItem()) {
 
-            net.minecraft.nbt.ListNBT enchTags = left.getEnchantmentTags();
-            if (!enchTags.isEmpty()) {
+            boolean isEnchantedBook = false;
+            net.minecraft.nbt.ListNBT enchTags;
+            if (left.getItem() instanceof net.minecraft.item.EnchantedBookItem) {
+                enchTags = ((net.minecraft.item.EnchantedBookItem)left.getItem()).getEnchantments(left);
+                isEnchantedBook = true;
+            }
+            else {
+                enchTags = left.getEnchantmentTags();
+            }
+            if (!(enchTags.isEmpty() || (isEnchantedBook && enchTags.size() <= 1))) {
 
                 ItemStack out = left.copy();
                 net.minecraft.nbt.ListNBT newTags = enchTags.copy();
                 newTags.remove(0);
-                out.addTagElement("Enchantments", newTags);
+                out.addTagElement(isEnchantedBook ? "StoredEnchantments" : "Enchantments", newTags);
 
                 net.minecraft.nbt.CompoundNBT ench = enchTags.getCompound(0);
                 int cost = getApplyCost(getEnchantmentFromStringId(ench.getString("id")), 1);
@@ -113,8 +121,17 @@ public class RepairCostTweak extends Tweak {
 
         if(TweakConfig.anvilDisenchant.get() && net.minecraft.item.Items.BOOK == event.getIngredientInput().getItem()) {
             ItemStack left = event.getItemInput();
-            net.minecraft.nbt.ListNBT enchTags = left.getEnchantmentTags();
-            if (!enchTags.isEmpty()) {
+
+            boolean isEnchantedBook = false;
+            net.minecraft.nbt.ListNBT enchTags;
+            if (left.getItem() instanceof net.minecraft.item.EnchantedBookItem) {
+                enchTags = ((net.minecraft.item.EnchantedBookItem)left.getItem()).getEnchantments(left);
+                isEnchantedBook = true;
+            }
+            else {
+                enchTags = left.getEnchantmentTags();
+            }
+            if (!(enchTags.isEmpty() || (isEnchantedBook && enchTags.size() <= 1))) {
                 net.minecraft.nbt.CompoundNBT ench = enchTags.getCompound(0);
 
                 ItemStack book = new ItemStack(net.minecraft.item.Items.ENCHANTED_BOOK);
