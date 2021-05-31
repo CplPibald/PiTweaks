@@ -36,12 +36,12 @@ public class TweakConfig {
         builder.pop();
 
         builder.comment("Vanilla Machine Speed Tweaks").push("machines");
-        furnaceEnabled          = builder.comment("Vanilla furnaces are faster.  If you toggle this, you must break and re-place any furnaces.").define("fastFurnace", true);
-        blastFurnaceEnabled     = builder.comment("Vanilla blast furnaces are faster.  If you toggle this, you must break and re-place any blast furnaces.").define("fastBlastFurnace", true);
-        smokerEnabled           = builder.comment("Vanilla smokers are faster.  If you toggle this, you must break and re-place any smokers.").define("fastSmoker", true);
-        campfireEnabled         = builder.comment("Vanilla campfires cook faster.  If you toggle this, you must break and re-place any campfires.").define("fastCampfire", true);
+        furnaceEnabled          = builder.comment("Vanilla furnaces are faster.").define("fastFurnace", true);
+        blastFurnaceEnabled     = builder.comment("Vanilla blast furnaces are faster.").define("fastBlastFurnace", true);
+        smokerEnabled           = builder.comment("Vanilla smokers are faster.").define("fastSmoker", true);
+        campfireEnabled         = builder.comment("Vanilla campfires cook faster.").define("fastCampfire", true);
         furnaceMultiplier       = builder.comment("Cook speed multiplier for furnace, blast furnace, and smoker. Time per item is (10/multiplier) seconds. Valid values (2,4,5,8,10,20,25,40,50)").defineInRange("multiplier", 20, 2, 50);
-        brewingEnabled          = builder.comment("Brewing stands are faster.  If you toggle this, you must break and re-place any brewing stands.").define("fastBrewing", true);
+        brewingEnabled          = builder.comment("Brewing stands are faster.").define("fastBrewing", true);
         brewingTicks            = builder.comment("Number of ticks to brew a potion.  Vanilla = 400.").defineInRange("brewTicks", 20, 2, 400);
         builder.pop();
 
