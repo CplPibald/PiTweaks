@@ -22,6 +22,7 @@ public class TweakConfig {
     public static ForgeConfigSpec.BooleanValue   spawnFullCubeEnabled;
     public static ForgeConfigSpec.BooleanValue   allowPhantoms;
     public static ForgeConfigSpec.BooleanValue   noInvulnerabilityTicks;
+    public static ForgeConfigSpec.BooleanValue   crouchStopsFlight;
     public static ForgeConfigSpec.BooleanValue   playerUncapFood;
     public static ForgeConfigSpec.BooleanValue   playerUncapSaturation;
     public static ForgeConfigSpec.BooleanValue   instantLeafDecay;
@@ -49,6 +50,7 @@ public class TweakConfig {
         spawnFullCubeEnabled    = builder.comment("Mobs can only spawn blocks with a full-cube collision box.  Prevents spawning on partial blocks like top-slabs, upside-down-stairs, and hoppers.").define("spawnRequiresFullCube", true);
         allowPhantoms           = builder.comment("Set to false to disable phantom spawns.").define("allowPhantoms", true);
         noInvulnerabilityTicks  = builder.comment("Removes 0.5 sec invulnerability time after an entity gets hit.").define("noInvulnerabilityTicks", false);
+        crouchStopsFlight       = builder.comment("Crouch while flying to immediately end elytra flight.").define("crouchStopsFlight", true);
         builder.pop();
 
         builder.comment("Hunger Tweaks").push("food");

@@ -44,10 +44,23 @@ public class SpawnOnCubeTweak extends Tweak {
         }
     }
 
+    // Other entity tweaks below.  This file should probably be renamed
+
+    // Invulnerability tweak
     @net.minecraftforge.eventbus.api.SubscribeEvent
     public void onLivingHurt(net.minecraftforge.event.entity.living.LivingHurtEvent event) {
         if (TweakConfig.noInvulnerabilityTicks.get()) {
             event.getEntityLiving().invulnerableTime = 0;
+        }
+    }
+
+    // End Elytra flight tweak
+    @net.minecraftforge.eventbus.api.SubscribeEvent
+    public void onPlayerTick(net.minecraftforge.event.TickEvent.PlayerTickEvent event) {
+        if (event.player.isFallFlying() && event.player.isShiftKeyDown()) {
+            if (TweakConfig.crouchStopsFlight.get()) {
+                event.player.stopFallFlying();
+            }
         }
     }
 }
